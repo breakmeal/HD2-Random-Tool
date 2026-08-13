@@ -1,0 +1,132 @@
+/* 任务档案：与敌人档案共用分屏机制（.mission-mode），入口色为紫色。 */
+.mission-overlay {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 60;
+  width: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: visible;
+  background: #0c100d;
+  border-left: 1px solid #596553;
+  box-shadow: -22px 0 60px rgba(0,0,0,.44);
+  transition: width .62s cubic-bezier(.2,.8,.2,1), visibility 0s linear .62s;
+}
+.mission-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg,rgba(9,13,10,.38),#0c100d 39%,#0c100d 100%),
+    linear-gradient(90deg,rgba(9,13,10,.97),rgba(17,22,18,.7));
+  opacity: .7;
+}
+.mission-overlay.open {
+  width: 87.5%;
+  visibility: visible;
+  pointer-events: auto;
+  transition: width .62s cubic-bezier(.2,.8,.2,1), visibility 0s;
+}
+.mission-drawer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 0 28px 42px;
+  scrollbar-color: #4d5a4e #101410;
+  opacity: 0;
+  transform: translateX(42px);
+  transition: opacity .24s ease, transform .4s ease;
+}
+.mission-overlay.open .mission-drawer { opacity: 1; transform: none; transition-delay: .2s; }
+.mission-drawer-head { min-height: 142px; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #344035; padding: 31px 0 23px; }
+.mission-drawer-head h2 { font: 800 39px/1 "Barlow Condensed","Noto Sans SC"; margin: 7px 0 6px; color: #f1f3e9; text-shadow: 0 4px 18px #000; }
+.mission-drawer-head p { font-size: 11px; color: #8c978a; margin: 0; }
+.mission-close { width: 38px; height: 38px; border: 1px solid #4b574c; background: rgba(19,24,19,.88); color: #e7ebe0; cursor: pointer; font-size: 24px; line-height: 1; }
+.mission-close:hover,.mission-close:focus-visible { border-color: var(--mission-color,#b18aff); color: var(--mission-color,#b18aff); outline: 0; }
+.mission-drawer-toolbar { display: grid; grid-template-columns: 1fr 230px; gap: 10px; padding: 16px 0 12px; position: sticky; top: 0; background: rgba(12,16,13,.96); backdrop-filter: blur(12px); z-index: 3; }
+.mission-factions { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
+.mission-faction-tab { border: 1px solid #303a31; background: #131813; color: #808a80; text-align: left; padding: 10px 12px; cursor: pointer; min-width: 0; }
+.mission-faction-tab b,.mission-faction-tab small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mission-faction-tab b { font-size: 12px; }
+.mission-faction-tab small { font: 600 10px "Barlow Condensed"; letter-spacing: .08em; margin-top: 3px; }
+.mission-faction-tab.active { border-color: var(--faction-color); background: color-mix(in srgb,var(--faction-color) 13%,#131813); color: #f0f2e9; box-shadow: inset 0 -2px 0 var(--faction-color); }
+.mission-faction-tab.active b { color: var(--faction-color); }
+.mission-search { height: 42px; border: 1px solid #354035; background: #101410; display: flex; align-items: center; gap: 9px; padding: 0 11px; }
+.mission-search span { color: #778278; font-size: 21px; }
+.mission-search input { border: 0; outline: 0; background: transparent; color: #eef0e8; width: 100%; font-size: 12px; }
+
+/* 难度梯度参考 */
+.mission-difficulty-bar { display: flex; flex-wrap: wrap; gap: 5px; padding: 8px 0 10px; border-bottom: 1px solid #2a332c; }
+.mission-diff-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border: 1px solid #333c34; background: #121712; color: #9aa398; font-size: 10px; cursor: default; }
+.mission-diff-chip b { color: #e8ebe2; font: 700 12px "Barlow Condensed"; }
+.mission-diff-chip small { color: #6e776d; font: 600 9px "Barlow Condensed"; letter-spacing: .04em; }
+.mission-diff-chip.high { border-color: #4a3d1a; background: #1a1710; }
+.mission-diff-chip.high b { color: var(--yellow); }
+
+.mission-status { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 30px; color: #778176; font-size: 11px; }
+.mission-status b { color: #e6e9df; }
+.mission-status .faction-note { color: #8e978a; max-width: 72%; text-align: right; }
+.mission-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(170px,1fr)); gap: 10px; padding-top: 5px; }
+.mission-card { appearance: none; padding: 0; color: inherit; text-align: left; border: 1px solid #303a31; background: #121712; min-width: 0; overflow: hidden; cursor: pointer; transition: border-color .18s,transform .18s,box-shadow .18s; }
+.mission-card:hover,.mission-card:focus-visible { border-color: var(--faction-color); transform: translateY(-3px); box-shadow: 0 13px 28px rgba(0,0,0,.34); outline: 0; }
+.mission-card-visual { aspect-ratio: 1/1; background: #0b0f0c; display: grid; place-items: center; position: relative; overflow: hidden; border-bottom: 1px solid #2c352d; }
+.mission-image { width: 74%; height: 74%; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(0,0,0,.7)); }
+.mission-card-visual::after { content: ""; position: absolute; inset: auto 0 0; height: 16%; background: linear-gradient(transparent,rgba(8,11,9,.7)); pointer-events: none; }
+.mission-card-visual.missing::before { content: "图像暂不可用"; position: absolute; color: #657067; font-size: 10px; letter-spacing: .08em; }
+.mission-diff-badge { position: absolute; left: 9px; top: 9px; z-index: 1; font: 700 10px "Barlow Condensed"; color: var(--faction-color); border: 1px solid color-mix(in srgb,var(--faction-color) 48%,#333); background: rgba(9,12,10,.88); padding: 4px 6px; }
+.mission-card-caption { min-height: 76px; padding: 11px 12px 12px; position: relative; }
+.mission-card-caption h3 { font-size: 14px; line-height: 1.25; margin: 0; color: #edf0e7; }
+.mission-card-caption span { display: block; margin-top: 4px; color: #778176; font: 600 10px "Barlow Condensed"; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-card-caption i { display: block; margin-top: 8px; color: var(--faction-color); font: normal 700 9px "Noto Sans SC"; }
+.mission-empty { grid-column: 1/-1; border: 1px dashed #3a463c; padding: 24px; color: #788278; font-size: 12px; line-height: 1.7; }
+.mission-note { grid-column: 1/-1; color: #637064; font-size: 10px; line-height: 1.6; border-top: 1px solid #273029; padding-top: 12px; margin-top: 3px; }
+
+/* 任务详情 */
+.mission-focus { position: absolute; inset: 0; z-index: 12; display: grid; place-items: center; padding: 22px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .2s ease,visibility 0s linear .2s; }
+.mission-focus.open { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .2s ease,visibility 0s; }
+.mission-focus-backdrop { position: absolute; inset: 0; border: 0; background: rgba(3,5,4,.82); backdrop-filter: blur(8px); cursor: pointer; }
+.mission-focus-dialog { position: relative; width: min(960px,calc(100vw - 44px)); max-height: min(760px,calc(100vh - 44px)); overflow: auto; border: 1px solid #465248; background: #111612; box-shadow: 0 26px 80px rgba(0,0,0,.72); transform: translateY(14px) scale(.98); transition: transform .24s ease; }
+.mission-focus.open .mission-focus-dialog { transform: none; }
+.mission-focus-close { position: absolute; right: 12px; top: 12px; z-index: 2; width: 38px; height: 38px; border: 1px solid #586359; background: #111612; color: #edf0e8; font-size: 23px; cursor: pointer; }
+.mission-focus-close:hover,.mission-focus-close:focus-visible { color: var(--yellow); border-color: var(--yellow); outline: 0; }
+.mission-focus-layout { display: grid; grid-template-columns: minmax(280px,40%) 1fr; min-height: 540px; }
+.mission-focus-visual { position: relative; overflow: hidden; display: grid; place-items: center; min-height: 540px; background: #090d0a; border-right: 1px solid #303a31; }
+.mission-focus-visual img { width: 66%; height: auto; object-fit: contain; filter: drop-shadow(0 16px 18px rgba(0,0,0,.72)); }
+.mission-focus-visual > span { position: absolute; z-index: 1; left: 14px; top: 14px; color: var(--faction-color); font: 700 10px "Barlow Condensed"; letter-spacing: .08em; }
+.mission-focus-body { padding: 40px 34px 30px; }
+.mission-focus-heading { padding-bottom: 18px; border-bottom: 1px solid #303a31; }
+.mission-focus-heading small { color: var(--faction-color); font-size: 10px; }
+.mission-focus-heading h2 { margin: 8px 0 4px; color: #f1f3eb; font-size: 30px; line-height: 1.1; }
+.mission-focus-heading p { margin: 0; color: #7c867d; font: 600 13px "Barlow Condensed"; }
+.mission-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.mission-meta-item { padding: 7px 11px; border: 1px solid #39423a; background: #151a15; color: #b8bfb3; font-size: 11px; }
+.mission-meta-item b { color: var(--yellow); font: 700 13px "Barlow Condensed"; margin-left: 4px; }
+.mission-fact { margin-top: 18px; }
+.mission-fact small { display: block; color: var(--faction-color); font: 700 10px "Barlow Condensed"; letter-spacing: .08em; margin-bottom: 5px; }
+.mission-fact p { color: #a3aca0; font-size: 13px; line-height: 1.75; margin: 0; }
+.mission-fact.difficulty { border-left: 3px solid var(--yellow); padding-left: 13px; }
+.mission-fact.difficulty small { color: var(--yellow); }
+.mission-card-source { display: block; margin-top: 22px; color: #5f6b61; font: 600 9px "Barlow Condensed"; letter-spacing: .05em; text-decoration: none; }
+.mission-card-source:hover { color: var(--yellow); }
+
+@media(max-width:700px) {
+  .mission-drawer { padding: 0 16px 32px; }
+  .mission-drawer-head { min-height: 112px; padding-top: 22px; }
+  .mission-drawer-head h2 { font-size: 30px; }
+  .mission-drawer-toolbar { grid-template-columns: 1fr; padding-top: 12px; }
+  .mission-factions { grid-template-columns: repeat(2,1fr); gap: 4px; }
+  .mission-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .mission-focus { padding: 10px; }
+  .mission-focus-dialog { width: calc(100vw - 20px); max-height: calc(100vh - 20px); }
+  .mission-focus-layout { grid-template-columns: 1fr; }
+  .mission-focus-visual { min-height: 40vh; max-height: 40vh; border-right: 0; border-bottom: 1px solid #303a31; }
+  .mission-focus-body { padding: 24px 20px 22px; }
+  .mission-status { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .mission-status .faction-note { max-width: none; text-align: left; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .mission-overlay,.mission-drawer,.mission-focus,.mission-focus-dialog { transition-duration: .01ms!important; }
+}

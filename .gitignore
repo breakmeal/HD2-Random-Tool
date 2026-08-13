@@ -1,0 +1,23 @@
+# 桌面应用构建产物（build.ps1 从根目录重新生成）
+desktop-app/.venv/
+desktop-app/build/
+desktop-app/dist/
+desktop-app/bundle/
+desktop-app/__pycache__/
+desktop-app/*.spec
+
+# Python
+__pycache__/
+*.pyc
+
+# 测试/基准临时文件（脚本运行时生成）
+bench-*.html
+smoke-test.html
+visual-shot.png
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+screencut/
+github-upload/

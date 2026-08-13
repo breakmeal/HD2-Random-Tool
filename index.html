@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1180" />
+  <meta name="theme-color" content="#080a09" />
+  <title>超级地球 · 随机军备终端</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="codex.css" />
+  <link rel="stylesheet" href="enemy-dossier.css" />
+  <link rel="stylesheet" href="interface-refresh.css" />
+  <link rel="stylesheet" href="mission-dossier.css" />
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="experience-shell" id="experienceShell">
+  <div class="earth-stage" id="earthStage">
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="返回顶部">
+      <span class="brand-mark"><img src="assets/ui/helldivers-2-logo-white.webp" alt="HELLDIVERS 2"></span>
+      <span><b>超级地球军备部</b><small>非官方随机挑战终端</small></span>
+    </a>
+    <div class="top-actions">
+      <button class="icon-button" id="shareBtn" title="复制当前配置链接" aria-label="复制当前配置链接">↗</button>
+      <button class="icon-button" id="resetBtn" title="恢复默认配置" aria-label="恢复默认配置">↺</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow"><i></i> SES 民主随机协议 // ONLINE</div>
+      <h1>让管理式民主<br><em>决定你的火力</em></h1>
+      <p>从你真正拥有的装备中生成一套完整挑战配置。按战争债券整组启用，或精确关闭任何一件装备。</p>
+      <div class="hero-meta">
+        <span><b id="releasedCount">22</b> 已发布债券</span>
+        <span><b id="gearCount">—</b> 件可配置装备</span>
+        <span class="upcoming-dot"><b id="upcomingCount">1</b> 个待发布档案</span>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="主要功能">
+      <button class="tab active" data-tab="roulette"><span>01</span>随机部署</button>
+      <button class="tab" data-tab="armory"><span>02</span>军备库</button>
+      <button class="tab" data-tab="weights"><span>03</span>战备权重</button>
+    </nav>
+
+    <section class="panel active" id="roulettePanel">
+      <div class="section-heading">
+        <div><span class="kicker">DEPLOYMENT LOADOUT</span><h2>本次部署配置</h2></div>
+        <div class="deployment-status"><div class="pool-status"><span></span><b id="poolCount">—</b> 件装备待命</div><div class="mission-target" id="missionTarget"><span class="mission-target-label">敌情指派</span><div id="missionTargetOptions" class="mission-target-options"></div></div></div>
+      </div>
+
+      <div class="loadout-grid" id="loadoutGrid"></div>
+
+      <div class="roll-zone">
+        <div class="roll-options">
+          <label class="check"><input id="oneBackpack" type="checkbox" checked><span></span>最多一件背包装备</label>
+          <label class="check"><input id="oneSupport" type="checkbox"><span></span>最多一件支援武器</label>
+          <label class="check"><input id="includeBooster" type="checkbox" checked><span></span>随机强化剂</label>
+        </div>
+        <button class="roll-button" id="rollBtn"><span class="dice">◆</span><span><b>执行民主配给</b><small>GENERATE RANDOM LOADOUT</small></span></button>
+        <p id="rollHint">所有结果均来自已发布且已启用的装备。</p>
+        <div class="loadout-code-bar">
+          <label class="search loadout-code-field"><span>⌗</span><input id="loadoutCodeInput" type="text" placeholder="粘贴配给编号（SES-L1-…）载入，随机后自动生成" autocomplete="off" spellcheck="false" aria-label="配给编号"></label>
+          <button class="small-button" id="loadCodeBtn" type="button">载入编号</button>
+          <button class="small-button muted" id="copyCodeBtn" type="button">复制编号</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="armoryPanel">
+      <div class="section-heading armory-heading">
+        <div><span class="kicker">AUTHORIZED INVENTORY</span><h2>个人军备库</h2></div>
+        <div class="armory-actions">
+          <button class="small-button" id="enableAllBtn">全部启用</button>
+          <button class="small-button muted" id="disablePaidBtn">仅保留基础装备</button>
+        </div>
+      </div>
+      <div class="filterbar">
+        <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="搜索中文名、英文名或型号…"></label>
+        <select id="typeFilter" aria-label="装备类型">
+          <option value="all">全部类型</option>
+          <option value="primary">主武器</option>
+          <option value="secondary">次要武器</option>
+          <option value="throwable">投掷物</option>
+          <option value="stratagem">战略配备</option>
+          <option value="booster">强化剂</option>
+        </select>
+        <label class="check compact"><input id="enabledOnly" type="checkbox"><span></span>只看已启用</label>
+      </div>
+      <div class="armory-workspace">
+        <aside class="warbond-nav" aria-label="战争债券筛选">
+          <div class="warbond-nav-label">战争债券</div>
+          <div id="warbondNav" class="warbond-nav-list"></div>
+        </aside>
+        <section class="armory-catalog" aria-live="polite">
+          <div id="warbondList" class="warbond-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="panel" id="weightsPanel">
+      <div class="section-heading weights-heading">
+        <div><span class="kicker">STRATAGEM WEIGHT CONTROL</span><h2>战略配备权重</h2></div>
+        <button class="small-button muted" id="resetWeightsBtn">恢复当前敌族默认值</button>
+      </div>
+      <div class="weights-toolbar">
+        <div class="weight-factions" id="weightFactions" role="radiogroup" aria-label="编辑敌族权重"></div>
+        <label class="search"><span>⌕</span><input id="weightSearch" type="search" placeholder="搜索战略配备中文名、英文名或型号…"></label>
+      </div>
+      <div class="weights-note"><span>i</span><p>启用开关决定战略配备是否进入随机池；这里的 1–100 权重决定它在当前敌族任务中被抽中的相对概率。初始值沿用原战备强度值。</p></div>
+      <div class="weight-list" id="weightList" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" id="codexPanel">
+      <div class="section-heading codex-heading">
+        <div><span class="kicker">EQUIPMENT INTELLIGENCE</span><h2>装备图鉴与伤害档案</h2></div>
+        <div class="codex-coverage"><b id="imageCoverage">199 / 199</b><span>本地装备图片</span><i></i><b id="dataCoverage">—</b><span>结构化详情</span></div>
+      </div>
+      <div class="codex-note"><span>i</span><p>伤害均为基础单次伤害。霰弹枪显示单颗弹丸伤害；“耐久”指对耐久部位的伤害。爆炸半径依次为全伤害内圈、衰减外圈与最大影响范围。</p></div>
+      <div class="codex-category-groups" id="codexCategories" aria-label="图鉴装备分类"></div>
+      <div class="filterbar codex-filters">
+        <label class="search"><span>⌕</span><input id="codexSearch" type="search" placeholder="搜索装备中文名、英文名或型号…"></label>
+        <select id="codexWarbond" aria-label="图鉴战争债券"><option value="all">全部来源</option></select>
+        <label class="check compact"><input id="statsOnly" type="checkbox"><span></span>只看有伤害数据</label>
+      </div>
+      <div class="codex-resultbar"><span id="codexResultCount">—</span><div class="codex-legend"><i class="direct"></i>直击 <i class="durable"></i>耐久 <i class="blast"></i>爆炸/范围</div></div>
+      <div class="codex-grid" id="codexGrid"></div>
+    </section>
+
+    <section class="panel" id="intelPanel">
+      <div class="section-heading">
+        <div><span class="kicker">MINISTRY OF TRUTH ARCHIVE</span><h2>数据口径与译名</h2></div>
+      </div>
+      <div class="intel-grid">
+        <article class="intel-card accent"><span class="intel-no">01</span><h3>发布边界</h3><p>数据库以 2026-08-08 可核实资料为界。已公布但尚未实装的战争债券单独存档，并由程序硬性排除在随机池之外。</p></article>
+        <article class="intel-card"><span class="intel-no">02</span><h3>中文译名</h3><p>繁体中文 PlayStation 官方博客存在对应名称时优先采用并转换为简体；其余依据装备语义翻译，型号原样保留，英文名始终随附以便核对。</p></article>
+        <article class="intel-card"><span class="intel-no">03</span><h3>随机规则</h3><p>每次固定抽取主武器、次要武器、投掷物与四项不同战略配备；可选强化剂。背包与支援武器限制会在抽取时即时生效。</p></article>
+      </div>
+      <div class="source-box">
+        <h3>资料来源</h3>
+        <div class="sources">
+          <a href="https://helldivers.wiki.gg/wiki/Warbond" target="_blank" rel="noreferrer"><span>↗</span><b>Helldivers Wiki</b><small>战争债券、武器与战略配备目录</small></a>
+          <a href="https://blog.playstation.com/tag/helldivers-2/" target="_blank" rel="noreferrer"><span>↗</span><b>PlayStation Blog</b><small>发布日期与官方英文名称</small></a>
+          <a href="https://blog.zh-hant.playstation.com/tag/helldivers-2/" target="_blank" rel="noreferrer"><span>↗</span><b>PlayStation Blog 中文</b><small>官方繁体中文译名参考</small></a>
+        </div>
+        <p class="disclaimer">《HELLDIVERS 2》及相关名称归 Arrowhead Game Studios / Sony Interactive Entertainment 所有。本工具为非官方粉丝作品。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>SUPER EARTH ARMED FORCES</span><b>为了自由 · 为了民主 · 为了随机装备</b><span>BUILD 2026.08</span></footer>
+  <button class="earth-stage-return" id="earthStageReturn" type="button" aria-label="返回超级地球装备终端">
+    <span class="earth-stage-mark" aria-hidden="true">⬢</span>
+    <span><small>RETURN TO</small><b>超级地球</b><em>SUPER EARTH</em></span>
+    <i aria-hidden="true">›</i>
+  </button>
+  </div>
+
+  <div class="archive-overlay" id="archiveOverlay" aria-hidden="true">
+    <div class="archive-drawer" id="archiveDrawer" role="region" aria-label="超级地球档案舞台"></div>
+    <button class="codex-top" id="codexTopBtn" type="button" aria-label="回到图鉴顶部">↑ 顶部</button>
+  </div>
+
+  <nav class="right-rail" aria-label="档案与资料入口">
+    <button class="side-portal enemy-portal" id="enemyDossierBtn" type="button" aria-label="打开敌人档案" aria-controls="enemyOverlay" aria-expanded="false">
+      <span class="side-portal-scan enemy-portal-scan" aria-hidden="true"></span>
+      <span class="side-portal-copy enemy-portal-copy"><small>HOSTILE INTELLIGENCE</small><b>敌人</b><em>ENEMIES</em></span>
+      <span class="side-portal-arrow enemy-portal-arrow" aria-hidden="true">‹</span>
+    </button>
+    <button class="side-portal mission-portal" id="missionDossierBtn" type="button" aria-label="打开任务档案" aria-controls="missionOverlay" aria-expanded="false">
+      <span class="side-portal-scan" aria-hidden="true"></span>
+      <span class="side-portal-copy"><small>OPERATION BRIEFING</small><b>任务</b><em>MISSIONS</em></span>
+      <span class="side-portal-arrow" aria-hidden="true">‹</span>
+    </button>
+    <button class="side-portal codex-portal" type="button" data-tab="codex" aria-label="打开装备图鉴" aria-controls="archiveOverlay" aria-expanded="false">
+      <span class="side-portal-scan" aria-hidden="true"></span>
+      <span class="side-portal-copy"><small>EQUIPMENT INDEX</small><b>装备图鉴</b><em>CODEX</em></span>
+      <span class="side-portal-arrow" aria-hidden="true">‹</span>
+    </button>
+    <button class="side-portal intel-portal" type="button" data-tab="intel" aria-label="打开资料与译名" aria-controls="archiveOverlay" aria-expanded="false">
+      <span class="side-portal-scan" aria-hidden="true"></span>
+      <span class="side-portal-copy"><small>MINISTRY ARCHIVE</small><b>资料与译名</b><em>INTELLIGENCE</em></span>
+      <span class="side-portal-arrow" aria-hidden="true">‹</span>
+    </button>
+  </nav>
+
+  <div class="enemy-overlay" id="enemyOverlay" aria-hidden="true">
+    <section class="enemy-drawer" role="region" aria-labelledby="enemyDossierTitle">
+      <header class="enemy-drawer-head">
+        <div><span class="kicker">MINISTRY OF DEFENSE // THREAT INDEX</span><h2 id="enemyDossierTitle">敌人档案</h2><p>三阵营战场识别与弱点速查</p></div>
+        <button class="enemy-close" data-close-enemy aria-label="返回超级地球">×</button>
+      </header>
+      <div class="enemy-drawer-toolbar">
+        <div class="enemy-factions" id="enemyFactions" role="tablist" aria-label="敌人阵营"></div>
+        <label class="enemy-search"><span>⌕</span><input id="enemySearch" type="search" placeholder="搜索敌人中英文名" /></label>
+      </div>
+      <div class="enemy-status" id="enemyStatus"></div>
+      <div class="enemy-grid" id="enemyGrid"></div>
+    </section>
+    <div class="enemy-focus" id="enemyFocus" aria-hidden="true">
+      <button class="enemy-focus-backdrop" type="button" data-close-enemy-detail aria-label="关闭敌人详情"></button>
+      <article class="enemy-focus-dialog" role="dialog" aria-modal="true" aria-labelledby="enemyFocusTitle">
+        <button class="enemy-focus-close" type="button" data-close-enemy-detail aria-label="关闭敌人详情">×</button>
+        <div id="enemyFocusContent"></div>
+      </article>
+    </div>
+  </div>
+
+  <div class="mission-overlay" id="missionOverlay" aria-hidden="true">
+    <section class="mission-drawer" role="region" aria-labelledby="missionDossierTitle">
+      <header class="mission-drawer-head">
+        <div><span class="kicker">MINISTRY OF DEFENSE // OPERATION INDEX</span><h2 id="missionDossierTitle">任务档案</h2><p>各阵营主任务目标与难度差异</p></div>
+        <button class="mission-close" data-close-mission aria-label="返回超级地球">×</button>
+      </header>
+      <div class="mission-drawer-toolbar">
+        <div class="mission-factions" id="missionFactions" role="tablist" aria-label="任务阵营"></div>
+        <label class="mission-search"><span>⌕</span><input id="missionSearch" type="search" placeholder="搜索任务中英文名" /></label>
+      </div>
+      <div class="mission-difficulty-bar" id="missionDifficultyBar" aria-label="难度梯度参考"></div>
+      <div class="mission-status" id="missionStatus"></div>
+      <div class="mission-grid" id="missionGrid"></div>
+    </section>
+    <div class="mission-focus" id="missionFocus" aria-hidden="true">
+      <button class="mission-focus-backdrop" type="button" data-close-mission-detail aria-label="关闭任务详情"></button>
+      <article class="mission-focus-dialog" role="dialog" aria-modal="true" aria-labelledby="missionFocusTitle">
+        <button class="mission-focus-close" type="button" data-close-mission-detail aria-label="关闭任务详情">×</button>
+        <div id="missionFocusContent"></div>
+      </article>
+    </div>
+  </div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="data.js" defer></script>
+  <script src="equipment-details.js" defer></script>
+  <script src="enemy-data.js" defer></script>
+  <script src="mission-data.js" defer></script>
+  <script src="stratagem-ratings.js" defer></script>
+  <script src="refreshed-images.js" defer></script>
+  <script src="equipment-descriptions-zh.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="codex-v2.js" defer></script>
+  <script src="enemy-dossier.js" defer></script>
+  <script src="mission-dossier.js" defer></script>
+</body>
+</html>
